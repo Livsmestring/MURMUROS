@@ -1,0 +1,51 @@
+name: Shared CI/CD Pipeline
+
+on:
+  workflow_call: # Enables reuse across repositories
+    inputs:
+      node-version:
+        description: 'Node.js version'
+        required: true
+      build-command:
+        description: 'Build command for the project'
+        required: false
+        default: 'npm run build'
+      test-command:
+        description: 'Test command for the project'
+        required: false
+        default: 'npm test'
+      deploy-command:
+        description: 'Deploy command for the project'
+        required: false
+        default: 'npm run deploy:staging'
+    secrets:
+      API_KEY: # Accept secrets for use in jobs
+        required: false
+
+jobs:
+  build-test-deploy:
+    name: Build-Test-and-Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build the project
+        if: ${{ inputs.build-command }}
+        run: ${{ inputs.build-command }}
+
+      - name: Run tests
+        run: ${{ inputs.test-command }}
+
+      - name: Deploy the project
+        if: ${{ inputs.deploy-command }}
+        run: ${{ inputs.deploy-command }}
