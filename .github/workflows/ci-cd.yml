@@ -16,7 +16,7 @@ jobs:
     steps:
       # Step 1: Check out the code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       # Step 2: Set up the environment (Install dependencies)
       - name: Set up Node.js
@@ -38,7 +38,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       # Step 1: Run a linter (e.g., ESLint for JavaScript/Node.js projects)
       - name: Run ESLint for code quality checks
@@ -55,7 +55,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       # Step 1: Run GitHub CodeQL analysis for security scanning
       - name: Initialize CodeQL
@@ -74,7 +74,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v6
 
       - name: Deploy Application
         run: npm run deploy:staging # Replace with actual deploy command
