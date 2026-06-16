@@ -52,33 +52,49 @@ MURMUROS/
 
 None of these directories exist yet — create them as features are implemented.
 
+## Languages
+
+The repo currently contains **Python** (`generate_midi.py`) and scaffolding for **JavaScript/Node.js**. Both are detected automatically by the CI pipeline.
+
+## Commands
+
+```bash
+# Python
+pip install -r requirements.txt
+python generate_midi.py          # generates bassline.mid
+
+# JavaScript (when source files are added)
+npm install
+npm test
+npm run lint                     # runs eslint .
+npm run deploy:staging           # placeholder until deploy is configured
+```
+
 ## CI/CD Pipeline
 
-Defined in `.github/workflows/ci-cd.yml`, triggered on push to `main` and all PRs:
+Defined in `.github/workflows/ci-cd.yml`, triggered on push to `main`, all PRs, and daily at 02:00 UTC:
 
-1. **Build & Test**: `npm install` → `npm test`
-2. **Static Analysis**: `npx eslint .` (no ESLint config exists yet — add `.eslintrc.*` when JS code is introduced)
-3. **Security**: GitHub CodeQL for JavaScript
-4. **Deploy**: `npm run deploy:staging` (only on `main`)
+1. **detect-languages** — checks for `.py` files and `package.json` to conditionally gate later steps
+2. **build-and-test** — `npm install` + `npm test` (JS) and `pip install -r requirements.txt` (Python)
+3. **static-analysis** — `eslint .` (JS) and `flake8` with max line length 100 (Python)
+4. **security-scan** — GitHub CodeQL scanning for both `javascript` and `python`
+5. **deploy** — `npm run deploy:staging`, runs only on `main`
 
-Node.js version target: **16**.
+Node.js target: **20 LTS**. Python target: **3.11**.
+
+Action versions: `actions/checkout@v4`, `actions/setup-node@v4`, `actions/setup-python@v5`, `github/codeql-action@v3`.
+
+**Dependabot** monitors npm (daily), pip (weekly), and GitHub Actions (weekly).
 
 ## Existing Code
 
 ### `generate_midi.py`
 
-A standalone Python utility that generates a MIDI bassline file (`bassline.mid`). Uses the `mido` library.
-
-```bash
-pip install mido
-python generate_midi.py
-```
-
-This is not yet integrated into the main platform — it is a standalone creative tool prototype.
+Standalone Python utility — generates a 4-note MIDI bassline (A2, C3, D3, E3) and writes `bassline.mid`. Not yet integrated into the platform.
 
 ## Development Notes
 
-- **Language**: The project content and documentation is in Norwegian. Code identifiers and commit messages may use English.
-- **No build or test commands exist yet.** When adding `package.json`, wire `npm test` and `npm run deploy:staging` to real scripts to keep CI green.
-- **Dependabot** is configured for both npm and GitHub Actions (`.github/dependabot.yml`), so keep dependency versions explicit once `package.json` is introduced.
-- The `shared-ci-cd.yml` workflow is a reusable template parameterised for other repositories — do not modify it to add MURMUROS-specific logic.
+- **Language**: Project content and documentation is in Norwegian. Code identifiers and commit messages may use English.
+- **ESLint** is configured in `.eslintrc.json` (env: node + es2022, extends `eslint:recommended`). Add rules there when JS source is introduced.
+- **Flake8** runs at `--max-line-length=100`. Add a `setup.cfg` or `tox.ini` `[flake8]` section to extend configuration.
+- The `shared-ci-cd.yml` workflow is a reusable template for other repositories — do not add MURMUROS-specific logic to it.
