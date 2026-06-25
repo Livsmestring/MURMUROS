@@ -24,12 +24,42 @@ jobs:
         with:
           node-version: 16
 
+      # No package.json exists yet (MVP 0.1 has no JS app code). Skip
+      # instead of hard-failing on infrastructure that hasn't been built.
       - name: Install dependencies
-        run: npm install
+        run: |
+          if [ -f package.json ]; then
+            npm install
+          else
+            echo "No package.json found, skipping npm install."
+          fi
 
-      # Step 3: Run Tests
       - name: Run tests
-        run: npm test
+        run: |
+          if [ -f package.json ]; then
+            npm test
+          else
+            echo "No package.json found, skipping npm test."
+          fi
+
+  python-test:
+    name: Python Test (generate_midi.py)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install dependencies
+        run: pip install mido pytest
+
+      - name: Run tests
+        run: pytest -v
 
   static-analysis:
     name: Static Analysis and Code Quality
