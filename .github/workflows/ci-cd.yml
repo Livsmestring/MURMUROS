@@ -53,6 +53,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: build-and-test
 
+    strategy:
+      fail-fast: false
+      matrix:
+        # Scan every language that actually exists in the repo. Today that is
+        # Python (generate_midi.py); JavaScript is kept for the planned Node.js
+        # platform code.
+        language: ['python', 'javascript']
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -61,7 +69,7 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v2
         with:
-          languages: 'javascript' # Update based on your repository
+          languages: ${{ matrix.language }}
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
