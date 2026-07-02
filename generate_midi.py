@@ -1,7 +1,7 @@
 from mido import Message, MidiFile, MidiTrack
 
-# Define notes for the bassline
-NOTES = [
+# Default notes for the bassline (note, velocity, duration in ticks)
+DEFAULT_NOTES = [
     {'note': 45, 'velocity': 70, 'duration': 480},  # A2
     {'note': 48, 'velocity': 70, 'duration': 480},  # C3
     {'note': 50, 'velocity': 70, 'duration': 480},  # D3
@@ -11,12 +11,16 @@ NOTES = [
 DEFAULT_FILENAME = 'bassline.mid'
 
 
-def build_bassline(notes=NOTES):
-    """Build a MidiFile containing a single track with the given bassline notes.
+def build_bassline(notes=None):
+    """Build a MIDI file containing a bassline from the given notes.
 
-    Each note produces a ``note_on`` immediately followed by a ``note_off``
-    after ``duration`` ticks. Returns the constructed ``MidiFile``.
+    Each note is a mapping with 'note', 'velocity' and 'duration' keys.
+    The note plays immediately (note_on at time 0) and is released after
+    'duration' ticks (note_off). Returns the constructed MidiFile.
     """
+    if notes is None:
+        notes = DEFAULT_NOTES
+
     mid = MidiFile()
     track = MidiTrack()
     mid.tracks.append(track)
@@ -28,12 +32,16 @@ def build_bassline(notes=NOTES):
     return mid
 
 
-def main(filename=DEFAULT_FILENAME):
-    """Build the bassline and save it to ``filename``."""
-    mid = build_bassline()
+def save_bassline(filename=DEFAULT_FILENAME, notes=None):
+    """Build the bassline and save it to 'filename'. Returns the MidiFile."""
+    mid = build_bassline(notes)
     mid.save(filename)
-    print(f"MIDI file '{filename}' created!")
-    return filename
+    return mid
+
+
+def main():
+    save_bassline()
+    print(f"MIDI file '{DEFAULT_FILENAME}' created!")
 
 
 if __name__ == '__main__':
