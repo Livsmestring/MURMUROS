@@ -1,6 +1,5 @@
 import os
 
-import pytest
 from mido import MidiFile
 
 import generate_midi
@@ -9,7 +8,7 @@ import generate_midi
 def test_notes_are_valid_midi_values():
     """Every note and velocity must be within the valid MIDI range (0-127)
     and durations must be non-negative."""
-    for n in generate_midi.NOTES:
+    for n in generate_midi.DEFAULT_NOTES:
         assert 0 <= n['note'] <= 127
         assert 0 <= n['velocity'] <= 127
         assert n['duration'] >= 0
@@ -25,9 +24,9 @@ def test_build_bassline_emits_note_on_off_pairs():
     mid = generate_midi.build_bassline()
     messages = [msg for msg in mid.tracks[0] if msg.type in ('note_on', 'note_off')]
 
-    assert len(messages) == 2 * len(generate_midi.NOTES)
+    assert len(messages) == 2 * len(generate_midi.DEFAULT_NOTES)
 
-    for i, n in enumerate(generate_midi.NOTES):
+    for i, n in enumerate(generate_midi.DEFAULT_NOTES):
         note_on = messages[2 * i]
         note_off = messages[2 * i + 1]
 
@@ -50,14 +49,13 @@ def test_build_bassline_respects_custom_notes():
     assert messages[1].time == 240
 
 
-def test_main_writes_a_readable_file(tmp_path):
+def test_save_bassline_writes_readable_file(tmp_path):
     """The saved file must exist and round-trip back through mido."""
     target = tmp_path / 'out.mid'
-    returned = generate_midi.main(str(target))
+    generate_midi.save_bassline(str(target))
 
-    assert returned == str(target)
     assert os.path.exists(target)
 
     reloaded = MidiFile(str(target))
     messages = [msg for msg in reloaded.tracks[0] if msg.type in ('note_on', 'note_off')]
-    assert len(messages) == 2 * len(generate_midi.NOTES)
+    assert len(messages) == 2 * len(generate_midi.DEFAULT_NOTES)
