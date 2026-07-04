@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 MURMUROS is a Norwegian-language youth empowerment platform ("livsmestring" = life coping/mastery skills) developed by DevByNorth. It combines storytelling, music, art, and technology to support identity development and personal growth in young people.
 
-The project is in **MVP 0.1** — primarily documentation and scaffolding. The planned tech stack is Node.js/npm (reflected in CI/CD), but no `package.json` or application code exists yet.
+The project is in **MVP 0.1** — primarily documentation and scaffolding. The planned tech stack is Node.js/npm, but no `package.json` or application code exists yet; CI currently validates only the content that exists (YAML and Python).
 
 ## The MURMUROS Model
 
@@ -56,12 +56,10 @@ None of these directories exist yet — create them as features are implemented.
 
 Defined in `.github/workflows/ci-cd.yml`, triggered on push to `main` and all PRs:
 
-1. **Build & Test**: `npm install` → `npm test`
-2. **Static Analysis**: `npx eslint .` (no ESLint config exists yet — add `.eslintrc.*` when JS code is introduced)
-3. **Security**: GitHub CodeQL for JavaScript
-4. **Deploy**: `npm run deploy:staging` (only on `main`)
+1. **Lint YAML**: `yamllint -d relaxed --strict .github/`
+2. **Check Python**: `python -m compileall -q .`
 
-Node.js version target: **16**.
+The pipeline validates only what currently exists in the repository. When the Node.js application is introduced (`package.json`), reintroduce build/test (`npm test`), linting (ESLint), CodeQL security scanning and the staging deploy job. Target a current LTS Node.js version (20+) at that point — Node 16 is end-of-life.
 
 ## Existing Code
 

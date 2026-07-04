@@ -1,80 +1,50 @@
-name: CI/CD Pipeline for MURMUROS
+name: CI Pipeline for MURMUROS
+
+# The repository currently contains documentation, workflow definitions and a
+# standalone Python prototype — no Node.js application yet. This pipeline
+# validates exactly that content so CI stays green and meaningful.
+#
+# When the Node.js application lands (package.json), reintroduce the
+# build/test, ESLint, CodeQL and deploy jobs on a current LTS Node version.
 
 on:
-  schedule:
-    - cron: "0 2 * * *" # Runs at 2 AM daily
   push:
     branches:
       - main
   pull_request:
 
 jobs:
-  build-and-test:
-    name: Build and Test
+  lint-yaml:
+    name: Lint YAML
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # Step 2: Set up the environment (Install dependencies)
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          node-version: 16
+          python-version: "3.12"
 
-      - name: Install dependencies
-        run: npm install
+      - name: Install yamllint
+        run: pip install yamllint
 
-      # Step 3: Run Tests
-      - name: Run tests
-        run: npm test
+      - name: Lint YAML files
+        run: yamllint -d relaxed --strict .github/
 
-  static-analysis:
-    name: Static Analysis and Code Quality
+  check-python:
+    name: Check Python
     runs-on: ubuntu-latest
-    needs: build-and-test
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # Step 1: Run a linter (e.g., ESLint for JavaScript/Node.js projects)
-      - name: Run ESLint for code quality checks
-        run: npx eslint .
-
-      # Step 2: Run additional static analysis, if needed
-      - name: Static Code Analysis Placeholder
-        run: echo "Add tools like SonarCloud, PyLint, or Flake8 based on your project"
-
-  security-scan:
-    name: Security Scanning
-    runs-on: ubuntu-latest
-    needs: build-and-test
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      # Step 1: Run GitHub CodeQL analysis for security scanning
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          languages: 'javascript' # Update based on your repository
+          python-version: "3.12"
 
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-
-  deploy:
-    name: Deploy to Staging Environment
-    runs-on: ubuntu-latest
-    needs: [build-and-test, static-analysis, security-scan]
-    if: github.ref == 'refs/heads/main' # Deploy only from the main branch
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Deploy Application
-        run: npm run deploy:staging # Replace with actual deploy command
+      - name: Compile Python sources
+        run: python -m compileall -q .
