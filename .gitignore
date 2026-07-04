@@ -5,3 +5,6 @@ __pycache__/
 
 # Generated artifacts
 *.mid
+
+node_modules/
+npm-debug.log*

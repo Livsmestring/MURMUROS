@@ -1,0 +1,19 @@
+{
+  "name": "murmuros",
+  "version": "0.1.0",
+  "description": "MURMUROS — Norwegian youth empowerment platform (livsmestring) by DevByNorth.",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/pipeline.test.js",
+    "lint": "eslint .",
+    "deploy:staging": "echo \"No staging deploy configured yet (placeholder)\""
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "license": "SEE LICENSE IN LICENSE",
+  "devDependencies": {
+    "eslint": "^8.57.1"
+  }
+}
