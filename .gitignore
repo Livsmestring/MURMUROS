@@ -2,3 +2,6 @@ __pycache__/
 *.pyc
 .pytest_cache/
 *.mid
+
+node_modules/
+npm-debug.log*
