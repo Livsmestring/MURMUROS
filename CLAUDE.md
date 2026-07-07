@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 MURMUROS is a Norwegian-language youth empowerment platform ("livsmestring" = life coping/mastery skills) developed by DevByNorth. It combines storytelling, music, art, and technology to support identity development and personal growth in young people.
 
-The project is in **MVP 0.1** — primarily documentation and scaffolding. The planned tech stack is Node.js/npm, but no `package.json` or application code exists yet; CI currently validates only the content that exists (YAML and Python).
+The project is in **MVP 0.1** — documentation plus early scaffolding: a Node.js package (`package.json`, `index.js` with the pipeline-stage model, a JS test), a standalone Python MIDI prototype with pytest suites, and CI that validates all of it.
 
 ## The MURMUROS Model
 
@@ -54,22 +54,30 @@ None of these directories exist yet — create them as features are implemented.
 
 ## CI/CD Pipeline
 
-Defined in `.github/workflows/ci-cd.yml`, triggered on push to `main` and all PRs:
+Defined in `.github/workflows/ci-cd.yml`, triggered on push to `main`, all PRs, and a nightly schedule:
 
 1. **Lint YAML**: `yamllint -d relaxed --strict .github/`
-2. **Check Python**: `python -m compileall -q .`
+2. **Python Tests**: `pip install -r requirements-dev.txt` → `python -m pytest -q`
+3. **Build and Test (Node)**: `npm ci` → `npm test` (Node 20)
+4. **Static Analysis**: `npm run lint` (ESLint, config in `.eslintrc.json`)
+5. **Deploy**: `npm run deploy:staging` placeholder (only on `main`)
 
-The pipeline validates only what currently exists in the repository. When the Node.js application is introduced (`package.json`), reintroduce build/test (`npm test`), linting (ESLint), CodeQL security scanning and the staging deploy job. Target a current LTS Node.js version (20+) at that point — Node 16 is end-of-life.
+CodeQL security scanning runs via the repository's CodeQL "default setup" (Settings → Code security), so no CodeQL job is defined in the workflow — adding one would conflict with default setup.
 
 ## Existing Code
 
+### `index.js`
+
+The MURMUROS pipeline-stage model as a Node module (`PIPELINE_STAGES`, `nextStage()`). Tested by `test/pipeline.test.js` (`npm test`).
+
 ### `generate_midi.py`
 
-A standalone Python utility that generates a MIDI bassline file (`bassline.mid`). Uses the `mido` library.
+A standalone Python utility that generates a MIDI bassline file (`bassline.mid`). Uses the `mido` library; tested by the pytest suites.
 
 ```bash
-pip install mido
+pip install -r requirements-dev.txt
 python generate_midi.py
+python -m pytest -q
 ```
 
 This is not yet integrated into the main platform — it is a standalone creative tool prototype.
@@ -77,6 +85,6 @@ This is not yet integrated into the main platform — it is a standalone creativ
 ## Development Notes
 
 - **Language**: The project content and documentation is in Norwegian. Code identifiers and commit messages may use English.
-- **No build or test commands exist yet.** When adding `package.json`, wire `npm test` and `npm run deploy:staging` to real scripts to keep CI green.
-- **Dependabot** is configured for both npm and GitHub Actions (`.github/dependabot.yml`), so keep dependency versions explicit once `package.json` is introduced.
+- **Commands**: `npm test`, `npm run lint`, `python -m pytest -q`. The `deploy:staging` script is a placeholder until real deployment exists.
+- **Dependabot** is configured for npm, pip and GitHub Actions (`.github/dependabot.yml`), so keep dependency versions explicit.
 - The `shared-ci-cd.yml` workflow is a reusable template parameterised for other repositories — do not modify it to add MURMUROS-specific logic.

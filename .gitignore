@@ -1,0 +1,10 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Generated artifacts
+*.mid
+
+node_modules/
+npm-debug.log*
