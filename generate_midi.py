@@ -11,15 +11,47 @@ DEFAULT_NOTES = [
 DEFAULT_FILENAME = 'bassline.mid'
 
 
+def validate_notes(notes):
+    """Validate a sequence of note mappings, raising ValueError on bad input.
+
+    Each note must be a mapping with integer 'note' and 'velocity' in the
+    valid MIDI range (0-127) and a non-negative integer 'duration' in ticks.
+    Returns the notes unchanged so callers can validate inline.
+    """
+    for i, n in enumerate(notes):
+        try:
+            note = n['note']
+            velocity = n['velocity']
+            duration = n['duration']
+        except (TypeError, KeyError):
+            raise ValueError(
+                f"note {i}: expected a mapping with 'note', 'velocity' and "
+                f"'duration' keys, got {n!r}"
+            ) from None
+
+        for name, value in (('note', note), ('velocity', velocity)):
+            if not isinstance(value, int) or not 0 <= value <= 127:
+                raise ValueError(
+                    f"note {i}: {name} must be an integer in 0-127, got {value!r}"
+                )
+        if not isinstance(duration, int) or duration < 0:
+            raise ValueError(
+                f"note {i}: duration must be a non-negative integer, got {duration!r}"
+            )
+    return notes
+
+
 def build_bassline(notes=None):
     """Build a MIDI file containing a bassline from the given notes.
 
     Each note is a mapping with 'note', 'velocity' and 'duration' keys.
     The note plays immediately (note_on at time 0) and is released after
     'duration' ticks (note_off). Returns the constructed MidiFile.
+    Raises ValueError for notes outside the valid MIDI ranges.
     """
     if notes is None:
         notes = DEFAULT_NOTES
+    validate_notes(notes)
 
     mid = MidiFile()
     track = MidiTrack()

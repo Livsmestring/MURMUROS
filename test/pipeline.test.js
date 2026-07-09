@@ -1,7 +1,6 @@
 'use strict';
 
 // Minimal, dependency-free test runner using Node's built-in assert module.
-// Compatible with the Node 16 target used in CI (no node:test required).
 const assert = require('assert');
 
 const { PIPELINE_STAGES, nextStage } = require('../index');
@@ -44,6 +43,20 @@ test('nextStage returns null at the end of the pipeline', () => {
 
 test('nextStage returns null for an unknown stage', () => {
   assert.strictEqual(nextStage('Ukjent'), null);
+});
+
+test('nextStage tolerates non-string input', () => {
+  assert.strictEqual(nextStage(null), null);
+  assert.strictEqual(nextStage(undefined), null);
+  assert.strictEqual(nextStage(42), null);
+});
+
+test('pipeline stages are frozen against mutation', () => {
+  assert.ok(Object.isFrozen(PIPELINE_STAGES));
+  assert.throws(() => {
+    PIPELINE_STAGES.push('Ny fase');
+  }, TypeError);
+  assert.strictEqual(PIPELINE_STAGES.length, 9);
 });
 
 console.log(`\n${passed} passing`);

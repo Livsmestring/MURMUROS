@@ -10,7 +10,7 @@
     "deploy:staging": "echo \"No staging deploy configured yet (placeholder)\""
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=20"
   },
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
