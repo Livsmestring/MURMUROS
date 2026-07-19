@@ -43,7 +43,7 @@ jobs:
 
       # Step 2: Set up the environment (Install dependencies)
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version: 16
 
