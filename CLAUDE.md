@@ -56,10 +56,10 @@ None of these directories exist yet — create them as features are implemented.
 
 Defined in `.github/workflows/ci-cd.yml`, triggered on push to `main`, all PRs, and a nightly schedule:
 
-1. **Lint YAML**: `yamllint -d relaxed --strict .github/`
+1. **Lint YAML**: `yamllint --strict .github/`
 2. **Python Tests**: `pip install -r requirements-dev.txt` → `python -m pytest -q`
 3. **Build and Test (Node)**: `npm ci` → `npm test` (Node 20)
-4. **Static Analysis**: `npm run lint` (ESLint, config in `.eslintrc.json`)
+4. **Static Analysis**: `npm run lint` (ESLint 10, flat config in `eslint.config.js`)
 5. **Deploy**: `npm run deploy:staging` placeholder (only on `main`)
 
 CodeQL security scanning runs via the repository's CodeQL "default setup" (Settings → Code security), so no CodeQL job is defined in the workflow — adding one would conflict with default setup.

@@ -1,5 +1,10 @@
 name: Shared CI/CD Pipeline
 
+# Reusable workflow template. TRUST ASSUMPTION: the command inputs below are
+# executed verbatim in a shell, so this workflow must only be called from
+# trusted repositories within this organization — never with input derived
+# from untrusted sources (issue titles, PR bodies, forks, etc.).
+
 on:
   workflow_call: # Enables reuse across repositories
     inputs:
@@ -19,8 +24,14 @@ on:
         required: false
         default: 'npm run deploy:staging'
     secrets:
-      API_KEY: # Accept secrets for use in jobs
+      # Reserved for future deploy steps. Currently unused — no step reads it,
+      # so callers should not pass it until a consuming step exists.
+      API_KEY:
         required: false
+
+# Least-privilege default for the GITHUB_TOKEN across all jobs.
+permissions:
+  contents: read
 
 jobs:
   build-test-deploy:
@@ -29,10 +40,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: ${{ inputs.node-version }}
 

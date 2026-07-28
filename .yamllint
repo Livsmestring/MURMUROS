@@ -1,0 +1,7 @@
+# yamllint configuration. Line-length is disabled because supply-chain
+# SHA-pinning of GitHub Actions ("uses: owner/action@<40-char-sha> # vX.Y.Z")
+# makes >80-char lines unavoidable in workflow files.
+extends: relaxed
+
+rules:
+  line-length: disable
