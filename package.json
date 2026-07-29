@@ -5,7 +5,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "test": "node test/pipeline.test.js",
+    "test": "node test/run.js",
     "lint": "eslint .",
     "deploy:staging": "echo \"No staging deploy configured yet (placeholder)\""
   },
@@ -13,6 +13,9 @@
     "node": ">=16"
   },
   "license": "SEE LICENSE IN LICENSE",
+  "dependencies": {
+    "ajv": "^8.17.1"
+  },
   "devDependencies": {
     "eslint": "^8.57.1"
   }

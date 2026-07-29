@@ -1,0 +1,20 @@
+{
+  "id": "utforskeren",
+  "navn": "Utforskeren",
+  "beskrivelse": "Den som søker nye horisonter og mening gjennom bevegelse, oppdagelse og mot.",
+  "styrker": ["mot", "nysgjerrighet", "selvstendighet"],
+  "artistDNA": {
+    "sjanger": ["folk", "post-rock"],
+    "stemning": ["eventyrlysten", "reflektert"]
+  },
+  "musikkDNA": {
+    "tempo": { "min": 100, "max": 140 },
+    "toneart": ["D-dur", "E-moll"],
+    "instrumenter": ["kassegitar", "fiolin", "perkusjon"]
+  },
+  "visueltDNA": {
+    "farger": ["#264653", "#F4A261", "#E76F51"],
+    "former": ["horisont", "sirkel"],
+    "stil": "vidåpen og naturnær"
+  }
+}
