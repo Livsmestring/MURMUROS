@@ -50,7 +50,7 @@ MURMUROS/
 └── assets/
 ```
 
-None of these directories exist yet — create them as features are implemented.
+`core/` now exists (agent infrastructure); create the others as features are implemented.
 
 ## CI/CD Pipeline
 
@@ -65,6 +65,10 @@ Defined in `.github/workflows/ci-cd.yml`, triggered on push to `main`, all PRs, 
 CodeQL security scanning runs via the repository's CodeQL "default setup" (Settings → Code security), so no CodeQL job is defined in the workflow — adding one would conflict with default setup.
 
 ## Existing Code
+
+### `core/` + `agents.py` + `demo.py` (Python)
+
+The Murmur agent prototype. `core/blackboard.py` has the event model (`Event`, validated and immutable) and the async pub/sub board (`MurmurBlackboard`) agents communicate through — never directly with each other. `agents.py` implements the Observer → Architect → Pedagogue/Growth chain, mapping to the pipeline stages (Historie/Refleksjon → Arketype/DNA → Kreativt uttrykk/Mestring, with user override). `python demo.py` runs one full cycle. Tested by `tests/test_blackboard.py` and `tests/test_agents.py`.
 
 ### `index.js`
 
