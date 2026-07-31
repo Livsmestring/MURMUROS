@@ -1,8 +1,10 @@
 # Sikkerhetsaudit — MURMUROS
 
-**Dato:** 2026-07-31  
-**Revisor:** Claude Code (automatisert + manuell gjennomgang)  
-**Revisjon gjelder:** `Livsmestring/MURMUROS`, alle branches inkl. full git-historikk
+**Dato:** 2026-07-31 (oppdatert etter remediering)
+**Revisor:** Claude Code (automatisert + manuell gjennomgang)
+**Revisjon gjelder:** `Livsmestring/MURMUROS`, branch `claude/test-coverage-analysis-wn6c7z`, alle branches inkl. full git-historikk
+
+> Dette er en re-audit. Forrige versjon av denne rapporten (samme dato) identifiserte 8 funn i CI/CD-pipelinen. Alle 8 er siden rettet i commit `0fe1872` ("Harden CI/CD: permissions, SHA-pinned actions, secret scan, extensible structure"). Denne versjonen re-verifiserer hvert funn mot gjeldende kode og oppdaterer status.
 
 ---
 
@@ -11,200 +13,126 @@
 | Dimensjon | Status |
 |---|---|
 | **Stadium** | MVP 0.1 — primært dokumentasjon og scaffolding |
-| **Applikasjonskode** | `generate_midi.py` (Python, 36 linjer) — eneste kjørbare fil i HEAD |
+| **Applikasjonskode** | `generate_midi.py` (Python) + `test_generate_midi.py` — eneste kjørbare filer i HEAD |
 | **Runtime** | Ingen server, ingen database, ingen frontend-bundle |
-| **Deploy-mål** | Ingen aktiv deploy; `npm run deploy:staging` er placeholder i CI |
-| **Avhengigheter** | `mido` (Python, kun i CI); `eslint ^8.57.1` kun på usammenslåtte branches |
-| **CI/CD** | `.github/workflows/ci-cd.yml` (3 plattformjobber + deploy) + `shared-ci-cd.yml` (gjenbrukbar mal) |
-| **Hemmeligheter i kode** | Ingen funnet |
-| **Supabase / RLS / Next.js** | Ikke implementert — seksjoner 2, 3, 4 i mandatet er ikke-appliserbare på dette stadiet |
+| **Deploy-mål** | Ingen aktiv deploy; `npm run --if-present deploy:staging` er placeholder i CI |
+| **Avhengigheter** | `mido`, `pytest` (Python, pinnet i `requirements-dev.txt`); ingen JS-avhengigheter i HEAD ennå |
+| **CI/CD** | `.github/workflows/ci-cd.yml` (5 jobber: secret-scan, python, javascript, codeql, deploy) + `shared-ci-cd.yml` (gjenbrukbar mal) |
+| **Hemmeligheter i kode** | Ingen funnet (verifisert på nytt) |
+| **Supabase / RLS / Next.js** | Ikke implementert — seksjoner 2, 3, 4 i mandatet er fortsatt ikke-appliserbare |
 
-Repoet har ingen API-ruter, ingen klientbundle, ingen database og ingen påloggingsflyt. Alle sikkerhetsfunn i denne revisjonen gjelder derfor utelukkende CI/CD-pipeline og git-hygiene.
-
----
-
-## Funn
-
-### 🔴 HØYT — CI/CD
+Repoet har ingen API-ruter, ingen klientbundle, ingen database og ingen påloggingsflyt. Sikkerhetsbildet er derfor fortsatt utelukkende et CI/CD- og git-hygiene-spørsmål.
 
 ---
 
-#### F-01 · `ci-cd.yml` mangler `permissions:`-blokk
+## Status på tidligere funn
 
-**Fil:** `.github/workflows/ci-cd.yml` — hele filen (ingen `permissions:` deklarert)  
-**Alvorlighet:** Høy
+### ✅ F-01 · Manglende `permissions:`-blokk — **RETTET**
 
-**Problem:**  
-Uten en eksplisitt `permissions:`-blokk arver alle jobs den organisasjonsvide standardverdien for `GITHUB_TOKEN`. Dersom organisasjonen (eller GitHub sin policy-endring) lar skriverettigheter stå som standard, vil enhver CI-jobb — inkludert jobber som kjøres på PRs fra eksterne forks via `pull_request`-triggeren — ha rett til å pushe kode, opprette releases og slette branches. Selv med read-only standard vil CodeQL-jobben mangle nødvendig `security-events: write`, slik at sikkerhetsresultater ikke lastes opp til GitHub Security-fanen.
-
-En tidligere iterasjon av denne filen (commit `4b95a8d`, en usammenslått branch) inkluderte eksplisitt:
+**Fil:** `.github/workflows/ci-cd.yml` linje 10–11
 
 ```yaml
 permissions:
   contents: read
 ```
 
-Dette ble droppet i den nåværende HEAD-versjonen.
+Workflow-nivå `permissions: contents: read` er nå på plass. CodeQL-jobben har et eksplisitt job-nivå override (`security-events: write`, linje 89–91) begrenset til kun den jobben. GITHUB_TOKEN er nå read-only som standard for `secret-scan`, `python`, `javascript` og `deploy`.
 
-**Foreslått fiks:**  
-Legg til et workflow-nivå `permissions:`-direktiv med minste nødvendige rettigheter, og gi CodeQL-jobben et job-nivå override:
+**Verifisert:** Ja — lest direkte fra filen.
+
+---
+
+### ✅ F-02 · Actions referert med mutable tag — **RETTET**
+
+**Fil:** `.github/workflows/ci-cd.yml` og `shared-ci-cd.yml`, alle `uses:`-linjer
+
+Alle actions er nå pinnet til full commit-SHA med versjonskommentar, f.eks.:
 
 ```yaml
-permissions:
-  contents: read
-
-jobs:
-  security-scan:
-    permissions:
-      contents: read
-      security-events: write
+uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
+uses: github/codeql-action/init@a2983b8bed1923f44751c5c43237f479442827b3  # v3.37.4
+uses: trufflesecurity/trufflehog@6f3c981e7b77f235fd2702dd74af25fc4b72bf11  # v3.96.0
 ```
+
+**Sideeffekt:** Oppgraderingen fra `codeql-action@v2` til `v3.37.4` løste også Dependabot-alarmen ("1 high") som GitHub rapporterte ved forrige push mot en deprecated v2-action.
+
+**Merk:** Dependabot for `github-actions` (konfigurert i `.github/dependabot.yml`) vil fortsatt kunne foreslå oppdateringer av disse SHA-ene — det er tilsiktet og riktig kombinasjon av låst versjon + automatisk varsling.
 
 ---
 
-### 🟠 MIDDELS — CI/CD
+### ✅ F-03 · `npx eslint .` uten lokal konfig — **RETTET**
 
----
+**Fil:** `.github/workflows/ci-cd.yml`, `javascript`-jobben, linje 76–82
 
-#### F-02 · GitHub Actions referert med mutable tag, ikke SHA
-
-**Fil:** `.github/workflows/ci-cd.yml` linje 19, 23, 51, 54, 71, 88, 92, 97, 107  
-**Fil:** `.github/workflows/shared-ci-cd.yml` linje 32, 35  
-**Alvorlighet:** Middels
-
-**Problem:**  
-Alle actions er referert med semantisk tag (f.eks. `actions/checkout@v3`, `actions/setup-python@v5`, `github/codeql-action/init@v2`). Tags er mutable — en kompromittert vedlikeholder kan flytte tagen til en ny, ondsinnet commit uten å endre workflow-filen. Dette er et klassisk supply chain-angrep mot CI-systemer.
-
-**Eksempler på nåværende referanser:**
-```yaml
-uses: actions/checkout@v3
-uses: github/codeql-action/init@v2
-uses: github/codeql-action/analyze@v2
-```
-
-**Foreslått fiks:**  
-Pin alle actions til en spesifikk commit-SHA med en kommentar som angir tag-ekvivalenten:
+Lint-steget kjører nå betinget:
 
 ```yaml
-uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
-uses: github/codeql-action/init@v3@...  # pin SHA
+- name: Lint (ESLint)
+  run: |
+    if [ -f package.json ] && npm run 2>/dev/null | grep -q '^\s*lint'; then
+      npm run lint
+    else
+      echo "No lint script yet — skipping ESLint"
+    fi
 ```
 
-Bruk Dependabot (allerede konfigurert for `github-actions`) til å holde SHA-er oppdatert automatisk — det er riktig kombinasjon av "låst versjon" og automatiske oppgraderinger.
+Kjører kun `npm run lint` (ikke `npx eslint` direkte) og kun dersom et `lint`-script faktisk finnes i `package.json`. Ingen runtime-nedlasting fra npm i CI før dette er reelt konfigurert.
 
 ---
 
-#### F-03 · `static-analysis`-jobben kjører `npx eslint .` uten lokal konfig eller installasjon
+### ✅ F-04 · CodeQL dekket ikke Python — **RETTET**
 
-**Fil:** `.github/workflows/ci-cd.yml` linje 81  
-**Alvorlighet:** Middels
-
-**Problem:**  
-`npx eslint .` laster ned ESLint fra npm på kjøretidspunkt dersom det ikke er lokalt installert, og kjører det deretter i CI-miljøet med GITHUB_TOKEN tilgjengelig. To konsekvenser:
-
-1. **Supply chain:** `npx` henter fra npm uten integritetssjekk. I teorien kan en kompromittert `eslint`-pakke eksfiltrere GITHUB_TOKEN eller andre secrets til en ekstern server.
-2. **Ingen konfig → jobb feiler:** Det finnes ingen `.eslintrc.*`- eller `eslint.config.*`-fil i HEAD. ESLint uten config vil returnere feil eller advarsler som er konfigurasjonsavhengige. En `.eslintrc.json` eksisterer kun på en usammenslått branch (`commit 2ae6014`).
-
-**Foreslått fiks:**  
-Legg ESLint inn som en fastlåst `devDependency` i `package.json` og kjør via `npm run lint` (ikke `npx`). Legg til en `eslint.config.*`-fil i HEAD. Alternativt: guard-sjekk som allerede er gjort for `npm test`-steget.
-
----
-
-#### F-04 · CodeQL scanner kun JavaScript; Python dekkes ikke
-
-**Fil:** `.github/workflows/ci-cd.yml` linje 93  
-**Alvorlighet:** Middels
-
-**Problem:**  
-`codeql-action/init` er konfigurert med `languages: 'javascript'`. Eneste reelle kode i HEAD er imidlertid Python (`generate_midi.py`). Python skannes ikke for sikkerhetssårbarheter via CodeQL. Dersom fremtidig Python-kode introduserer f.eks. shell-injeksjon (`subprocess` med brukerinput) eller usikker filoperasjoner, fanges det ikke opp.
-
-En earlier branch-versjon (`commit b8581d5`) brukte en matrix-strategi som inkluderte Python:
+**Fil:** `.github/workflows/ci-cd.yml`, `codeql`-jobben, linje 84–98
 
 ```yaml
-matrix:
-  language: ['python', 'javascript']
+strategy:
+  fail-fast: false
+  matrix:
+    language: [python, javascript-typescript]  # ← add languages here
 ```
 
-**Foreslått fiks:**  
-Bytt til matrise-scanning som nevnt over, eller bruk GitHub sin CodeQL "default setup" i repository-innstillingene (som automatisk oppdager languages).
+Matrise-scanning er implementert. Begge relevante språk dekkes, og utvidelsespunktet er tydelig kommentert.
 
 ---
 
-#### F-05 · Ingen automatisk hemmelighets-skanning i PR-pipeline
+### ✅ F-05 · Ingen automatisk hemmelighets-skanning — **RETTET**
 
-**Fil:** `.github/workflows/ci-cd.yml`  
-**Alvorlighet:** Middels
+**Fil:** `.github/workflows/ci-cd.yml`, `secret-scan`-jobben, linje 16–25
 
-**Problem:**  
-Det finnes ingen trufflehog-, gitleaks- eller GitHub Secret Scanning-step i CI-pipelinen. Dersom en utvikler ved en feil committer en API-nøkkel eller passord, fanges det ikke automatisk opp av noen workflow. `music-tools-agent-`-repoet har TruffleHog som eget workflow, men det er ikke implementert her.
+TruffleHog kjører nå som egen jobb, først i pipelinen, med `fetch-depth: 0` (full historikk) og `--only-verified` for å redusere falske positiver. `deploy`-jobben har `secret-scan` i sin `needs`-liste, så en funnet hemmelighet blokkerer utrulling.
 
-Manuell gjennomgang av full git-historikk (`git log -p --all`) avdekket **ingen faktiske hemmeligheter** i dette repoet — men mangelen på automatisering betyr at fremtidige lekkasjer ikke fanges.
+**Ny manuell verifisering (denne revisjonen):** Manuelt søk etter `sk-`, `sbp_`, `whsec_`, `eyJ`, `-----BEGIN` i arbeidstreet og full `git log -p --all` ga **ingen treff**. `gitleaks` var ikke tilgjengelig i dette miljøet for automatisert kjøring — TruffleHog-jobben i CI dekker dette hullet fremover, men en ekstern `gitleaks`-kjøring anbefales som engangsverifisering utenfor dette miljøet dersom det er ønskelig med et andre verktøy som kryssjekk.
 
-**Foreslått fiks:**  
-Legg til et TruffleHog- eller gitleaks-steg i PR-workflowen:
+---
 
-```yaml
-- name: Secret Scan
-  uses: trufflesecurity/trufflehog@main  # pin til SHA
-  with:
-    path: ./
-    base: ${{ github.event.repository.default_branch }}
-    head: HEAD
+### ✅ F-06 · Ubrukt `API_KEY`-secret — **RETTET**
+
+**Fil:** `.github/workflows/shared-ci-cd.yml`
+
+`secrets: API_KEY:`-blokken er fjernet fra `workflow_call`-inputs. Filen inneholder ikke lenger noen dødt secret-deklarasjon.
+
+---
+
+### ✅ F-07 · Python-avhengigheter uten pinning — **RETTET**
+
+**Fil:** `requirements-dev.txt` (ny fil) + `.github/workflows/ci-cd.yml` linje 39
+
+```
+mido>=1.3,<2
+pytest>=8,<10
 ```
 
----
+CI installerer nå via `pip install -r requirements-dev.txt` i stedet for `pip install mido pytest`.
 
-### 🟡 LAV — CI/CD og git-hygiene
-
----
-
-#### F-06 · `shared-ci-cd.yml` deklarerer `API_KEY`-secret men bruker den aldri
-
-**Fil:** `.github/workflows/shared-ci-cd.yml` linje 22–23  
-**Alvorlighet:** Lav
-
-**Problem:**  
-Workflowen aksepterer en secret kalt `API_KEY` som valgfri input, men refererer aldri til `${{ secrets.API_KEY }}` noe sted i workflow-kroppen. Denne «døde» secret-deklarasjonen er forvirrende: en fremtidig bidragsyter kan tro den er i bruk og sende den videre gjennom en usikker `run:`-kommando (f.eks. `echo $API_KEY`), eller hensikten med secreten er uklar.
-
-**Foreslått fiks:**  
-Fjern secret-deklarasjonen inntil den faktisk trengs, eller dokumenter tydelig i kommentar hva den skal brukes til og hvem som setter den.
+**Ny verifisering:** `pip-audit -r requirements-dev.txt` kjørt på nytt i denne revisjonen — **ingen kjente sårbarheter**.
 
 ---
 
-#### F-07 · Python-avhengigheter i CI installeres uten versjons-pinning
+### ✅ F-08 · Ingen `.gitignore` — **RETTET**
 
-**Fil:** `.github/workflows/ci-cd.yml` linje 58  
-**Alvorlighet:** Lav
-
-**Problem:**  
-CI-steget kjører `pip install mido pytest` uten versjonsangivelse. Fremtidige builds kan dermed hente nyere versjoner automatisk, noe som kan:
-
-- Introdusere en fremtidig sårbarhet i en ny versjon av `mido` uten at CI-pipelinen gir varsel
-- Bryte tester dersom en ny versjon av pytest eller mido endrer API
-
-`pip-audit` kjørt mot installert `mido`-versjon i dette miljøet viste **ingen kjente sårbarheter** per 2026-07-31.
-
-**Foreslått fiks:**  
-Legg `mido>=1.3,<2` og `pytest>=8,<9` i en `requirements-dev.txt` (filen eksisterer allerede på usammenslåtte branches, commit `8c85c84`) og bruk `pip install -r requirements-dev.txt` i CI.
-
----
-
-#### F-08 · Ingen `.gitignore` i HEAD
-
-**Fil:** Rot-katalogen — ingen `.gitignore` finnes  
-**Alvorlighet:** Lav
-
-**Problem:**  
-En `.gitignore`-fil fantes i tidligere branches/commits (f.eks. `commit 121f13c`) men er ikke tilstede i HEAD på verken `main` eller den nåværende feature-branchen. Uten den kan følgende ved et uhell committes:
-
-- `bassline.mid` — generert MIDI-fil fra `generate_midi.py`
-- `__pycache__/`, `*.pyc`, `.pytest_cache/` — Python-mellomfiler
-- `node_modules/` — når JS-avhengigheter legges til
-
-Disse filene er ikke sensitive, men de øker støyen i historikken og gjør diffs vanskeligere å lese.
-
-**Foreslått fiks:**  
-Opprett `.gitignore` med minimum:
+**Fil:** `.gitignore` (ny fil)
 
 ```
 __pycache__/
@@ -215,30 +143,53 @@ node_modules/
 npm-debug.log*
 ```
 
+**Ny verifisering:** Gjennomgikk alle filer som noensinne har eksistert i git-historikken (`git log --all` + `git ls-tree -r` per commit) mot disse mønstrene — ingen `.mid`-filer, `__pycache__`, `.pyc`-filer eller `node_modules` er noensinne committet. `.gitignore` er derfor forebyggende, ikke opprydding av eksisterende problem.
+
+---
+
+## Nye observasjoner fra denne re-auditen
+
+Ingen nye kritiske eller høye funn. To lave observasjoner verdt å notere for videre oppfølging:
+
+### 🟡 O-01 · `gitleaks` ikke tilgjengelig for uavhengig verifisering i dette miljøet
+
+**Alvorlighet:** Lav (informativ, ikke en sårbarhet)
+
+Mandatet ba om at gitleaks kjøres i tillegg til manuelt søk. Verktøyet var ikke installert i dette CLI-miljøet, og kunne derfor ikke kjøres direkte mot verken arbeidstre eller full historikk her. TruffleHog dekker samme kategori (og kjører nå automatisk i CI via F-05-fiksen), men er et annet regelsett enn gitleaks. Vurder å kjøre gitleaks manuelt én gang via et miljø som har verktøyet installert, som en uavhengig kryssjekk av CI-scanneren.
+
+### 🟡 O-02 · Ingen `CODEOWNERS` eller branch protection verifisert
+
+**Alvorlighet:** Lav (utenfor kodebasen, kunne ikke verifiseres)
+
+Denne revisjonen dekker kun det som er synlig i repoets filtre (workflows, kode, git-historikk). Branch protection-regler, required reviewers og GitHub Environment-secrets for `deploy`-jobben er repository-innstillinger som ikke er en del av git-historikken og kunne derfor ikke revideres herfra. Anbefaling: verifiser i GitHub Settings → Branches at `main` krever PR-review og grønn CI før merge, siden `deploy`-jobben kjører automatisk på push til `main`.
+
 ---
 
 ## Sammendrag
 
 | ID | Alvorlighet | Funn | Status |
 |---|---|---|---|
-| F-01 | 🔴 Høy | Manglende `permissions:` i `ci-cd.yml` | Ufikset |
-| F-02 | 🟠 Middels | Actions referert med mutable tag, ikke SHA | Ufikset |
-| F-03 | 🟠 Middels | `npx eslint .` uten lokal installasjon eller konfig | Ufikset |
-| F-04 | 🟠 Middels | CodeQL dekker ikke Python | Ufikset |
-| F-05 | 🟠 Middels | Ingen hemmelighets-skanning i PR-pipeline | Ufikset |
-| F-06 | 🟡 Lav | `API_KEY`-secret deklarert men aldri brukt | Ufikset |
-| F-07 | 🟡 Lav | Python-avhengigheter uten versjons-pinning | Ufikset |
-| F-08 | 🟡 Lav | Ingen `.gitignore` i HEAD | Ufikset |
+| F-01 | 🔴 Høy | Manglende `permissions:` i `ci-cd.yml` | ✅ Rettet (commit `0fe1872`) |
+| F-02 | 🟠 Middels | Actions referert med mutable tag, ikke SHA | ✅ Rettet (commit `0fe1872`) |
+| F-03 | 🟠 Middels | `npx eslint .` uten lokal installasjon eller konfig | ✅ Rettet (commit `0fe1872`) |
+| F-04 | 🟠 Middels | CodeQL dekket ikke Python | ✅ Rettet (commit `0fe1872`) |
+| F-05 | 🟠 Middels | Ingen hemmelighets-skanning i PR-pipeline | ✅ Rettet (commit `0fe1872`) |
+| F-06 | 🟡 Lav | `API_KEY`-secret deklarert men aldri brukt | ✅ Rettet (commit `0fe1872`) |
+| F-07 | 🟡 Lav | Python-avhengigheter uten versjons-pinning | ✅ Rettet (commit `0fe1872`) |
+| F-08 | 🟡 Lav | Ingen `.gitignore` i HEAD | ✅ Rettet (commit `0fe1872`) |
+| O-01 | 🟡 Lav | Gitleaks ikke kjørbart i dette miljøet (informativ) | Åpen — anbefalt engangskryssjekk |
+| O-02 | 🟡 Lav | Branch protection / CODEOWNERS ikke verifiserbart herfra | Åpen — sjekkes i GitHub Settings |
 
-**Positive funn:**
-- Ingen hemmeligheter eller API-nøkler funnet i worktree eller full git-historikk (`git log -p --all`)
-- Ingen `.env`-filer commitet, verken i HEAD eller historikk
-- `pip-audit` mot `mido`: ingen kjente sårbarheter (2026-07-31)
-- `pull_request`-triggeren (ikke `pull_request_target`) er korrekt konfigurert — forks får ikke tilgang til secrets
-- `private: true` i historisk `package.json` hindrer utilsiktet npm-publisering
+**Positive funn (re-verifisert i denne revisjonen):**
+- Ingen hemmeligheter eller API-nøkler funnet i worktree eller full git-historikk
+- Ingen `.env`-filer noensinne committet
+- `pip-audit` mot `requirements-dev.txt`: ingen kjente sårbarheter
+- `pull_request`-triggeren (ikke `pull_request_target`) er korrekt brukt — forks får ikke tilgang til secrets
+- Ingen filer som matcher `.gitignore`-mønstre finnes noensinne i historikken
+- CI-pipelinen har nå least-privilege `permissions`, SHA-pinnede actions, automatisk secret-scanning og full CodeQL-språkdekning
 
-**Ikke-appliserbare seksjoner (pga. MVP 0.1-stadium):**
+**Ikke-appliserbare seksjoner (pga. MVP 0.1-stadium, uendret siden forrige revisjon):**
 - Klient/server-lekkasje: ingen klientbundle
 - API-endepunkter: ingen route handlers
 - Database: ingen Supabase/RLS
-- `npm audit`: ingen `package.json` i HEAD
+- `npm audit`: ingen `package.json` i HEAD ennå
