@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 MURMUROS is a Norwegian-language youth empowerment platform ("livsmestring" = life coping/mastery skills) developed by DevByNorth. It combines storytelling, music, art, and technology to support identity development and personal growth in young people.
 
-The project is in **MVP 0.1** — primarily documentation and scaffolding. The planned tech stack is Node.js/npm (reflected in CI/CD), but no `package.json` or application code exists yet.
+The project is in **MVP 0.1** — primarily documentation and scaffolding. The tech stack is Node.js/npm (reflected in CI/CD); a minimal `package.json` and `index.js` exist, exposing the MURMUROS pipeline stages (see below) with tests in `test/pipeline.test.js`.
 
 ## The MURMUROS Model
 
@@ -57,7 +57,7 @@ None of these directories exist yet — create them as features are implemented.
 Defined in `.github/workflows/ci-cd.yml`, triggered on push to `main` and all PRs:
 
 1. **Build & Test**: `npm install` → `npm test`
-2. **Static Analysis**: `npx eslint .` (no ESLint config exists yet — add `.eslintrc.*` when JS code is introduced)
+2. **Static Analysis**: `npx eslint .` (config in `.eslintrc.json`)
 3. **Security**: GitHub CodeQL for JavaScript
 4. **Deploy**: `npm run deploy:staging` (only on `main`)
 
@@ -79,6 +79,6 @@ This is not yet integrated into the main platform — it is a standalone creativ
 ## Development Notes
 
 - **Language**: The project content and documentation is in Norwegian. Code identifiers and commit messages may use English.
-- **No build or test commands exist yet.** When adding `package.json`, wire `npm test` and `npm run deploy:staging` to real scripts to keep CI green.
-- **Dependabot** is configured for both npm and GitHub Actions (`.github/dependabot.yml`), so keep dependency versions explicit once `package.json` is introduced.
+- `npm test` runs `test/pipeline.test.js` (Node's built-in `assert`, no test framework dependency). `npm run deploy:staging` is still a placeholder — wire it to a real deploy script when staging infrastructure exists.
+- **Dependabot** is configured for npm, pip, and GitHub Actions (`.github/dependabot.yml`) — keep dependency versions explicit in `package.json` and `requirements-dev.txt`.
 - The `shared-ci-cd.yml` workflow is a reusable template parameterised for other repositories — do not modify it to add MURMUROS-specific logic.

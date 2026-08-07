@@ -47,25 +47,12 @@ jobs:
         with:
           node-version: 16
 
-      # The Node.js platform code is not scaffolded yet (no package.json).
-      # Guard these steps so the pipeline does not fail before that code lands;
-      # they activate automatically once a package.json is committed.
       - name: Install dependencies
-        run: |
-          if [ -f package.json ]; then
-            npm install
-          else
-            echo "No package.json yet — skipping npm install."
-          fi
+        run: npm install
 
       # Step 3: Run Tests
       - name: Run tests
-        run: |
-          if [ -f package.json ]; then
-            npm test
-          else
-            echo "No package.json yet — skipping npm test (see python-tests job)."
-          fi
+        run: npm test
 
   static-analysis:
     name: Static Analysis and Code Quality
@@ -76,15 +63,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Step 1: Run a linter (e.g., ESLint for JavaScript/Node.js projects).
-      # Skipped until an ESLint config exists so it does not fail the pipeline.
+      # Step 1: Run ESLint for code quality checks
       - name: Run ESLint for code quality checks
-        run: |
-          if ls .eslintrc* eslint.config.* >/dev/null 2>&1; then
-            npx eslint .
-          else
-            echo "No ESLint config yet — skipping lint."
-          fi
+        run: npx eslint .
 
       # Step 2: Run additional static analysis, if needed
       - name: Static Code Analysis Placeholder
@@ -108,9 +89,4 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Deploy Application
-        run: |
-          if [ -f package.json ] && npm run | grep -q 'deploy:staging'; then
-            npm run deploy:staging
-          else
-            echo "No deploy:staging script yet — skipping deploy."
-          fi
+        run: npm run deploy:staging

@@ -5,6 +5,15 @@ from mido import MidiFile
 import generate_midi
 
 
+def test_default_notes_are_valid_midi_values():
+    # Every note and velocity must be within the valid MIDI range (0-127)
+    # and durations must be non-negative.
+    for note in generate_midi.DEFAULT_NOTES:
+        assert 0 <= note['note'] <= 127
+        assert 0 <= note['velocity'] <= 127
+        assert note['duration'] >= 0
+
+
 def test_build_bassline_default_track_count():
     mid = generate_midi.build_bassline()
     assert len(mid.tracks) == 1
