@@ -5,7 +5,7 @@
  * Each stage feeds the next, from a young person's story through to mastery.
  * See README.md / CLAUDE.md for the canonical description.
  */
-const PIPELINE_STAGES = [
+const PIPELINE_STAGES = Object.freeze([
   'Historie', // Story
   'Refleksjon', // Reflection
   'Arketype', // Archetype
@@ -15,7 +15,7 @@ const PIPELINE_STAGES = [
   'Avatar',
   'Kreativt uttrykk', // Creative expression
   'Mestring', // Mastery
-];
+]);
 
 /**
  * Return the stage that follows the given stage in the pipeline, or null if

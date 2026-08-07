@@ -10,10 +10,12 @@
     "deploy:staging": "echo \"No staging deploy configured yet (placeholder)\""
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=20"
   },
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
-    "eslint": "^8.57.1"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.0",
+    "globals": "^17.8.0"
   }
 }

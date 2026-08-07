@@ -1,38 +1,77 @@
 name: Shared CI/CD Pipeline
 
+# Reusable workflow template. Command inputs are restricted to npm commands
+# (validated against an allowlist before anything runs) and are passed to the
+# shell via environment variables, never interpolated into script text.
+# TRUST ASSUMPTION: even with validation, this workflow should only be called
+# from trusted repositories within this organization.
+
 on:
   workflow_call: # Enables reuse across repositories
     inputs:
       node-version:
         description: 'Node.js version'
         required: true
+        type: string
       build-command:
-        description: 'Build command for the project'
+        description: >-
+          Optional build command (must match ^npm (ci|test|run <script>)$).
+          Empty (default) skips the build step.
         required: false
-        default: 'npm run build'
+        default: ''
+        type: string
       test-command:
-        description: 'Test command for the project'
+        description: 'Test command (npm-only, see build-command)'
         required: false
         default: 'npm test'
+        type: string
       deploy-command:
-        description: 'Deploy command for the project'
+        description: >-
+          Optional deploy command (npm-only, see build-command).
+          Empty (default) skips the deploy step.
         required: false
-        default: 'npm run deploy:staging'
+        default: ''
+        type: string
     secrets:
-      API_KEY: # Accept secrets for use in jobs
+      # Reserved for future deploy steps. Currently unused — no step reads it,
+      # so callers should not pass it until a consuming step exists.
+      API_KEY:
         required: false
+
+# Least-privilege default for the GITHUB_TOKEN across all jobs.
+permissions:
+  contents: read
 
 jobs:
   build-test-deploy:
     name: Build-Test-and-Deploy
     runs-on: ubuntu-latest
 
+    env:
+      BUILD_COMMAND: ${{ inputs.build-command }}
+      TEST_COMMAND: ${{ inputs.test-command }}
+      DEPLOY_COMMAND: ${{ inputs.deploy-command }}
+
     steps:
+      # Reject anything that is not a plain npm command before running steps.
+      # This blocks shell metacharacters (;, &&, |, $(), backticks, …) and
+      # arbitrary binaries, closing the command-injection surface of raw
+      # string inputs.
+      - name: Validate command inputs
+        run: |
+          allowed='^npm (ci|test|run [A-Za-z0-9:_.-]+)$'
+          for cmd in "$BUILD_COMMAND" "$TEST_COMMAND" "$DEPLOY_COMMAND"; do
+            if [ -n "$cmd" ] && ! printf '%s' "$cmd" | grep -Eq "$allowed"; then
+              echo "::error::Disallowed command input: '$cmd' (must match $allowed)"
+              exit 1
+            fi
+          done
+
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: ${{ inputs.node-version }}
 
@@ -40,12 +79,12 @@ jobs:
         run: npm install
 
       - name: Build the project
-        if: ${{ inputs.build-command }}
-        run: ${{ inputs.build-command }}
+        if: inputs.build-command != ''
+        run: $BUILD_COMMAND
 
       - name: Run tests
-        run: ${{ inputs.test-command }}
+        run: $TEST_COMMAND
 
       - name: Deploy the project
-        if: ${{ inputs.deploy-command }}
-        run: ${{ inputs.deploy-command }}
+        if: inputs.deploy-command != ''
+        run: $DEPLOY_COMMAND

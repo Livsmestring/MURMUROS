@@ -13,16 +13,30 @@ permissions:
   contents: read
 
 jobs:
+  lint-yaml:
+    name: Lint YAML
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - name: Lint YAML files
+        run: yamllint --strict .github/
+
   python-tests:
     name: Python Tests
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.11'
 
@@ -37,35 +51,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Check out the code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      # Step 2: Set up the environment (Install dependencies)
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 16
+          node-version: 20
+          cache: npm
 
-      # The Node.js platform code is not scaffolded yet (no package.json).
-      # Guard these steps so the pipeline does not fail before that code lands;
-      # they activate automatically once a package.json is committed.
       - name: Install dependencies
-        run: |
-          if [ -f package.json ]; then
-            npm install
-          else
-            echo "No package.json yet — skipping npm install."
-          fi
+        run: npm ci
 
-      # Step 3: Run Tests
       - name: Run tests
-        run: |
-          if [ -f package.json ]; then
-            npm test
-          else
-            echo "No package.json yet — skipping npm test (see python-tests job)."
-          fi
+        run: npm test
 
   static-analysis:
     name: Static Analysis and Code Quality
@@ -74,21 +73,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      # Step 1: Run a linter (e.g., ESLint for JavaScript/Node.js projects).
-      # Skipped until an ESLint config exists so it does not fail the pipeline.
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Run ESLint for code quality checks
-        run: |
-          if ls .eslintrc* eslint.config.* >/dev/null 2>&1; then
-            npx eslint .
-          else
-            echo "No ESLint config yet — skipping lint."
-          fi
-
-      # Step 2: Run additional static analysis, if needed
-      - name: Static Code Analysis Placeholder
-        run: echo "Add tools like SonarCloud, PyLint, or Flake8 based on your project"
+        run: npm run lint
 
   # NOTE: CodeQL security scanning is handled by the repository's CodeQL
   # "default setup" (Settings → Code security), which already scans Python and
@@ -100,12 +97,13 @@ jobs:
   deploy:
     name: Deploy to Staging Environment
     runs-on: ubuntu-latest
-    needs: [python-tests, build-and-test, static-analysis]
-    if: github.ref == 'refs/heads/main' # Deploy only from the main branch
+    needs: [lint-yaml, python-tests, build-and-test, static-analysis]
+    # Deploy only for pushes to main — not for scheduled (cron) runs.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Deploy Application
         run: |

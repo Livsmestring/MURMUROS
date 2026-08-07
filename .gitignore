@@ -2,9 +2,24 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.venv/
+venv/
 
 # Generated artifacts
 *.mid
 
+# Node.js
 node_modules/
 npm-debug.log*
+dist/
+coverage/
+
+# Environment / secrets — never commit these
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

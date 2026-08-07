@@ -1,10 +1,10 @@
 # MURMUROS
-Team work 
-MURMUROS TeamWork Livsmestring
 
-Historier blir til identitet. Identitet blir til mestring.
+[![CI/CD Pipeline](https://github.com/Livsmestring/MURMUROS/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Livsmestring/MURMUROS/actions/workflows/ci-cd.yml)
 
-Om prosjektet
+> Historier blir til identitet. Identitet blir til mestring.
+
+## Om prosjektet
 
 MURMUROS er et initiativ for livsmestring, kreativ utfoldelse og identitetsutvikling for ungdom.
 
@@ -12,19 +12,15 @@ Gjennom historiefortelling, kunst, musikk og teknologi får deltakere mulighet t
 
 Prosjektet kombinerer menneskelige erfaringer med kreative og digitale verktøy for å skape trygg refleksjon, tilhørighet og personlig vekst.
 
-⸻
-
-Visjon
+## Visjon
 
 Å skape en verden hvor alle unge mennesker blir sett, hørt og verdsatt.
 
-Misjon
+## Misjon
 
 Å utvikle verktøy og metoder som hjelper ungdom med å bygge identitet, mestring og håp gjennom kreativitet og teknologi.
 
-⸻
-
-Kjerneverdier
+## Kjerneverdier
 
 * Respekt
 * Inkludering
@@ -34,10 +30,9 @@ Kjerneverdier
 * Samarbeid
 * Innovasjon
 
-⸻
+## MURMUROS-modellen
 
-MURMUROS-modellen
-
+```
 Historie
     ↓
 Refleksjon
@@ -55,11 +50,13 @@ Avatar
 Kreativt uttrykk
     ↓
 Mestring
+```
 
-⸻
+## Repository-struktur
 
-Repository Struktur
+Planlagt struktur — mappene opprettes etter hvert som funksjonalitet kommer på plass:
 
+```
 MURMUROS/
 ├── docs/
 ├── onboarding/
@@ -74,30 +71,29 @@ MURMUROS/
 ├── LICENSE
 ├── CONTRIBUTING.md
 └── SECURITY.md
+```
 
-⸻
+Se [CONTRIBUTING.md](CONTRIBUTING.md) for hvordan du bidrar, og [SECURITY.md](SECURITY.md) for sikkerhetspolicy.
 
-Utviklingsområder
+## Utviklingsområder
 
-Livsmestring
+### Livsmestring
 
 Verktøy for refleksjon, identitet og personlig utvikling.
 
-Historiefortelling
+### Historiefortelling
 
 Trygge rammer for å dele erfaringer og perspektiver.
 
-Kreativitet
+### Kreativitet
 
 Musikk, kunst, design og visuelle uttrykk.
 
-Teknologi
+### Teknologi
 
 AI, digitale arbeidsflyter og moderne verktøy for læring og utvikling.
 
-⸻
-
-Målgrupper
+## Målgrupper
 
 * Ungdom
 * Skoler
@@ -107,45 +103,39 @@ Målgrupper
 * Kommuner
 * Kreative miljøer
 
-⸻
+## Roadmap
 
-Roadmap
-
-MVP 0.1
+### MVP 0.1
 
 * Dokumentasjon
 * Onboarding-system
 * Archetype Library
 * Data-modeller
 
-MVP 0.2
+### MVP 0.2
 
 * Story Engine
 * Artist DNA Engine
 * Dashboard
 
-MVP 0.3
+### MVP 0.3
 
 * Avatar System
 * Musikkidentitet
 * Pilotprosjekt
 
-v1.0
+### v1.0
 
 * MURMUROS Plattform
 * Ungdomsportal
 * Kreativt dashboard
 * Samarbeidsverktøy
 
-⸻
-
-DevByNorth
+## DevByNorth
 
 MURMUROS utvikles av DevByNorth som en del av arbeidet med kreativ teknologi, livsmestring og fremtidens digitale verktøy for ungdom.
 
-⸻
-
-Lisens
+## Lisens
 
 © DevByNorth. Alle rettigheter forbeholdes.
 
