@@ -3,17 +3,23 @@
   "version": "0.1.0",
   "description": "MURMUROS — Norwegian youth empowerment platform (livsmestring) by DevByNorth.",
   "private": true,
-  "main": "index.js",
+  "type": "module",
   "scripts": {
-    "test": "node test/pipeline.test.js",
     "lint": "eslint .",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
     "deploy:staging": "echo \"No staging deploy configured yet (placeholder)\""
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=20"
   },
   "license": "SEE LICENSE IN LICENSE",
   "devDependencies": {
-    "eslint": "^8.57.1"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.8.0",
+    "globals": "^17.9.0",
+    "typescript-eslint": "^8.66.0",
+    "vitest": "^4.1.10",
+    "zod": "^3.25.76"
   }
 }
