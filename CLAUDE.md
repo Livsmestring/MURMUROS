@@ -50,17 +50,18 @@ MURMUROS/
 └── assets/
 ```
 
-`core/` now exists (agent infrastructure); create the others as features are implemented.
+`core/`, `archetypes/` and `schemas/` now exist; create the rest as features are implemented.
 
 ## CI/CD Pipeline
 
 Defined in `.github/workflows/ci-cd.yml`, triggered on push to `main`, all PRs, and a nightly schedule:
 
-1. **Lint YAML**: `yamllint --strict .github/`
-2. **Python Tests**: `pip install -r requirements-dev.txt` → `python -m pytest -q`
-3. **Build and Test (Node)**: `npm ci` → `npm test` (Node 20)
-4. **Static Analysis**: `npm run lint` (ESLint 10, flat config in `eslint.config.js`)
-5. **Deploy**: `npm run deploy:staging` placeholder (only on `main`)
+1. **Secret Scan**: TruffleHog (`--only-verified`) over full history
+2. **Lint YAML**: `yamllint --strict .github/`
+3. **Python Tests**: `pip install -r requirements-dev.txt` → `python -m pytest -q`
+4. **Build and Test (Node)**: `npm ci` → `npm test` (Node 20)
+5. **Static Analysis**: `npm run lint` (ESLint 10, flat config in `eslint.config.js`)
+6. **Deploy**: `npm run deploy:staging` placeholder (only on `main`, push events only)
 
 CodeQL security scanning runs via the repository's CodeQL "default setup" (Settings → Code security), so no CodeQL job is defined in the workflow — adding one would conflict with default setup.
 
@@ -73,6 +74,10 @@ The Murmur agent prototype. `core/blackboard.py` has the event model (`Event`, v
 ### `index.js`
 
 The MURMUROS pipeline-stage model as a Node module (`PIPELINE_STAGES`, `nextStage()`). Tested by `test/pipeline.test.js` (`npm test`).
+
+### `schemas/` + `archetypes/`
+
+The Archetype Library data model. `schemas/archetype.schema.json` (JSON Schema draft-07) defines the shape of an archetype: `artistDNA`/`musikkDNA`/`visueltDNA` map onto the Artist DNA / Musikk DNA / Visuelt DNA pipeline stages. `archetypes/*.json` are the library entries (currently `skaperen.json`, `utforskeren.json`). Validated by `test/archetype.test.js` via `ajv` — checks schema validity, id/filename matching, id uniqueness, the tempo min≤max cross-field constraint (which JSON Schema alone can't express), and that a malformed record is actually rejected. `test/run.js` aggregates this with `test/pipeline.test.js` for `npm test`.
 
 ### `generate_midi.py`
 
