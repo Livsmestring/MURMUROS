@@ -70,3 +70,40 @@ def test_publish_validates_payload():
         assert bus.history == ()
 
     asyncio.run(scenario())
+
+
+def test_unsubscribe_stops_delivery():
+    async def scenario():
+        bus = MurmurBlackboard()
+        inbox = bus.subscribe('PING')
+        bus.unsubscribe('PING', inbox)
+
+        await bus.publish('PING', 'UnitTest', {'n': 1})
+
+        assert inbox.empty()
+
+    asyncio.run(scenario())
+
+
+def test_unsubscribe_is_idempotent_and_safe():
+    bus = MurmurBlackboard()
+    inbox = bus.subscribe('PING')
+    bus.unsubscribe('PING', inbox)
+    # Removing again, or removing something never subscribed, must not raise.
+    bus.unsubscribe('PING', inbox)
+    bus.unsubscribe('UNKNOWN', inbox)
+
+
+def test_unsubscribe_leaves_other_subscribers():
+    async def scenario():
+        bus = MurmurBlackboard()
+        keep = bus.subscribe('PING')
+        drop = bus.subscribe('PING')
+        bus.unsubscribe('PING', drop)
+
+        published = await bus.publish('PING', 'UnitTest', {'n': 1})
+
+        assert (await keep.get()).event_id == published.event_id
+        assert drop.empty()
+
+    asyncio.run(scenario())

@@ -45,6 +45,11 @@ async def run_pipeline() -> None:
         for key, text in quest.payload['options'].items():
             print(f'   [{key}] {text}')
         print(f'\n📜 Hendelser på tavlen: {len(bus.history)}')
+    except TimeoutError:
+        print(
+            f'\n⏱️  Ingen quest innen {QUEST_TIMEOUT_SECONDS}s — '
+            'en agent svarte ikke. Avbryter rent.'
+        )
     finally:
         for worker in workers:
             worker.cancel()

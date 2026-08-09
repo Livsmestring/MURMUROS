@@ -13,8 +13,11 @@ oppgaven deres kanselleres.
 from __future__ import annotations
 
 import asyncio
+import logging
 
 from core import Event, MurmurBlackboard
+
+logger = logging.getLogger(__name__)
 
 
 async def observer_agent(bus: MurmurBlackboard) -> None:
@@ -50,6 +53,13 @@ async def architect_agent(bus: MurmurBlackboard, inbox: asyncio.Queue[Event]) ->
                 'source_event_id': event.event_id,
             }
             await bus.publish('SYSTEM_DESIGN_READY', 'ArchitectAgent', payload)
+        except Exception:
+            # Log and keep the agent alive so one bad event does not kill the
+            # chain silently (a dead task is otherwise invisible).
+            logger.exception(
+                '[Architect] feilet under behandling av hendelse %s',
+                event.event_id,
+            )
         finally:
             inbox.task_done()
 
@@ -79,5 +89,12 @@ async def growth_and_pedagogue_consolidator(
                 'meta': event.payload,
             }
             await bus.publish('QUEST_GENERATED', 'CoreTeam', quest_payload)
+        except Exception:
+            # Log and keep the agent alive so one bad event does not kill the
+            # chain silently (a dead task is otherwise invisible).
+            logger.exception(
+                '[Pedagogue/Growth] feilet under behandling av hendelse %s',
+                event.event_id,
+            )
         finally:
             inbox.task_done()
