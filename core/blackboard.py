@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 
@@ -19,7 +19,7 @@ def _new_event_id() -> str:
 
 
 def _utcnow() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 @dataclass(frozen=True)
@@ -73,6 +73,21 @@ class MurmurBlackboard:
         inbox: asyncio.Queue[Event] = asyncio.Queue()
         self._subscribers.setdefault(event_type, []).append(inbox)
         return inbox
+
+    def unsubscribe(self, event_type: str, inbox: asyncio.Queue[Event]) -> None:
+        """Fjern et abonnement så køen ikke lever evig i en langvarig prosess.
+
+        Ukjent hendelsestype eller kø ignoreres stille (idempotent).
+        """
+        queues = self._subscribers.get(event_type)
+        if not queues:
+            return
+        try:
+            queues.remove(inbox)
+        except ValueError:
+            return
+        if not queues:
+            del self._subscribers[event_type]
 
     async def publish(
         self, event_type: str, source: str, payload: dict[str, Any]

@@ -58,8 +58,12 @@ def build_bassline(notes=None):
     mid.tracks.append(track)
 
     for n in notes:
-        track.append(Message('note_on', note=n['note'], velocity=n['velocity'], time=0))
-        track.append(Message('note_off', note=n['note'], velocity=n['velocity'], time=n['duration']))
+        track.append(
+            Message('note_on', note=n['note'], velocity=n['velocity'], time=0)
+        )
+        track.append(
+            Message('note_off', note=n['note'], velocity=n['velocity'], time=n['duration'])
+        )
 
     return mid
 
