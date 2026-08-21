@@ -66,6 +66,7 @@ MURMUROS/
 ├── data/
 ├── website/
 ├── assets/
+├── supabase/
 │
 ├── README.md
 ├── LICENSE
@@ -74,6 +75,14 @@ MURMUROS/
 ```
 
 Se [CONTRIBUTING.md](CONTRIBUTING.md) for hvordan du bidrar, og [SECURITY.md](SECURITY.md) for sikkerhetspolicy.
+
+## Database (Supabase)
+
+Backend-databasen kjører på Supabase-prosjektet **murmur-os-dev** (`gbbcvshngmbggozixniy`, org devbynorth). Skjema og RLS-policyer er versjonert som migrasjoner i [`supabase/migrations`](supabase/migrations), koblet til det aktive prosjektet via [`supabase/config.toml`](supabase/config.toml).
+
+For at GitHub → Supabase-koblingen skal være aktiv (automatisk migrasjonsdeploy ved push til `main`, samt PR-baserte preview branches), må en repo-eier koble repoet til prosjektet i Supabase-dashbordet **én gang**: Project Settings → Integrations → GitHub. Dette OAuth-steget kan ikke gjøres via API/CLI.
+
+Lokalt oppsett: kopier `.env.example` til `.env` og hent nøkkelverdiene fra [prosjektets API-innstillinger](https://supabase.com/dashboard/project/gbbcvshngmbggozixniy/settings/api).
 
 ## Utviklingsområder
 

@@ -1,0 +1,4 @@
+# Links this repo to the MURMUROS Supabase project (murmur-os-dev, ref: gbbcvshngmbggozixniy).
+# Used by the Supabase CLI and by Supabase's GitHub integration to know which
+# remote project `supabase/migrations` should be deployed to.
+project_id = "gbbcvshngmbggozixniy"
