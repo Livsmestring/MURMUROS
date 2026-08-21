@@ -86,6 +86,10 @@ python -m pytest -q
 
 This is not yet integrated into the main platform — it is a standalone creative tool prototype.
 
+### `supabase/`
+
+Schema and RLS policies for the **murmur-os-dev** Supabase project (ref `gbbcvshngmbggozixniy`, org devbynorth), versioned as migrations under `supabase/migrations/`. `supabase/config.toml` links this repo to that project via `project_id`. The GitHub↔Supabase link itself (auto-deploy migrations on push to `main`, PR preview branches) is Supabase's native GitHub integration, enabled once per repo in the Supabase dashboard (Project Settings → Integrations → GitHub) — that OAuth step can't be done via API/CLI, so it isn't part of any script here. A second, currently inactive/paused Supabase project named "MURMUROS" (ref `drjjkzvkmdhnvvspslyk`) also exists in the same org; it is not the one wired to this repo.
+
 ## Development Notes
 
 - **Language**: The project content and documentation is in Norwegian. Code identifiers and commit messages may use English.
