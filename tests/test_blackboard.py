@@ -70,3 +70,14 @@ def test_publish_validates_payload():
         assert bus.history == ()
 
     asyncio.run(scenario())
+
+
+def test_event_payload_is_immutable_and_detached_from_input():
+    payload = {'nested': {'items': [1, 2]}}
+    event = Event(event_type='TEST', source='UnitTest', payload=payload)
+
+    payload['nested']['items'].append(3)
+
+    assert event.payload['nested']['items'] == (1, 2)
+    with pytest.raises(TypeError):
+        event.payload['nested']['items'] = ()
