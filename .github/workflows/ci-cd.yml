@@ -49,8 +49,48 @@ jobs:
       - name: Run demo end-to-end tests
         run: python -m pytest -q tests/test_demo.py
 
+      - name: Start local mock-auth server
+        shell: bash
+        env:
+          MOCK_AUTH_TOKEN: local-test-token
+        run: |
+          set -euo pipefail
+          python tools/mock_auth_server.py --host 127.0.0.1 --port 18081 >/tmp/murmur-mock-auth.log 2>&1 &
+          echo "MOCK_AUTH_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Healthcheck local mock-auth server
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in {1..50}; do
+            if curl --fail --silent --show-error http://127.0.0.1:18081/healthz >/dev/null; then
+              echo "Mock-auth server is healthy."
+              exit 0
+            fi
+            if [ "$attempt" -eq 50 ]; then
+              echo "Healthcheck attempt $attempt/50 failed."
+            fi
+            sleep 0.1
+          done
+          echo "Mock-auth server failed healthcheck. Server log:"
+          cat /tmp/murmur-mock-auth.log
+          exit 1
+
       - name: Run mock-auth integration tests
+        env:
+          AUTH_BASE_URL: http://127.0.0.1:18081
+          API_KEY: local-test-token
         run: python -m pytest -q tests/test_mock_auth_server.py
+
+      - name: Stop local mock-auth server
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          if [ -n "${MOCK_AUTH_PID:-}" ]; then
+            kill "$MOCK_AUTH_PID" 2>/dev/null || true
+            wait "$MOCK_AUTH_PID" 2>/dev/null || true
+          fi
 
   build-and-test:
     name: Build and Test (Node)
