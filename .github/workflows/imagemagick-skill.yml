@@ -40,3 +40,36 @@ jobs:
 
       - name: Run Python syntax checks
         run: python -m py_compile skills/imagemagick-workflow/scripts/convert_images.py skills/imagemagick-workflow/scripts/test_convert_images.py skills/imagemagick-workflow/scripts/validate_skill.py
+
+  workflow-lint:
+    name: Lint workflows and shell
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Install ShellCheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends shellcheck
+
+      - name: Install Actionlint
+        env:
+          ACTIONLINT_VERSION: v1.7.7
+        run: |
+          go install "github.com/rhysd/actionlint/cmd/actionlint@${ACTIONLINT_VERSION}"
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Run Actionlint
+        run: actionlint
+
+      - name: Run ShellCheck on repository scripts
+        shell: bash
+        run: |
+          mapfile -d '' scripts < <(find . -path './.git' -prune -o -type f \( -name '*.sh' -o -name '*.bash' \) -print0)
+          if ((${#scripts[@]})); then
+            shellcheck --severity=warning "${scripts[@]}"
+          else
+            echo "No standalone shell scripts found; Actionlint still checks workflow run blocks."
+          fi
