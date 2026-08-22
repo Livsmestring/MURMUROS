@@ -86,6 +86,10 @@ python -m pytest -q
 
 This is not yet integrated into the main platform — it is a standalone creative tool prototype.
 
+### `generate_animal_signal.py`
+
+A second standalone MIDI prototype, same pattern as `generate_midi.py`: a multi-track "Animal Signal PsyTech" sketch (132 BPM, D minor) mapping animal calls onto musical roles — wolf howl → lead, bird calls → arpeggio, whale song → pad, frog sounds → bass stabs, raven calls → transition accents — for the Musikk DNA pipeline stage. Tested by `tests/test_generate_animal_signal.py`.
+
 ## Development Notes
 
 - **Language**: The project content and documentation is in Norwegian. Code identifiers and commit messages may use English.
