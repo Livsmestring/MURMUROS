@@ -49,6 +49,9 @@ jobs:
       - name: Run demo end-to-end tests
         run: python -m pytest -q tests/test_demo.py
 
+      - name: Run mock-auth integration tests
+        run: python -m pytest -q tests/test_mock_auth_server.py
+
   build-and-test:
     name: Build and Test (Node)
     runs-on: ubuntu-latest
