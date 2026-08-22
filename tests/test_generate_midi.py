@@ -86,6 +86,9 @@ def test_build_bassline_does_not_write_file(tmp_path, monkeypatch):
     {'note': 60, 'velocity': 200, 'duration': 480},   # velocity above range
     {'note': 60, 'velocity': 70, 'duration': -1},     # negative duration
     {'note': 'A2', 'velocity': 70, 'duration': 480},  # wrong type
+    {'note': True, 'velocity': 70, 'duration': 480},   # bool is not a MIDI integer
+    {'note': 60, 'velocity': False, 'duration': 480},  # bool is not a MIDI integer
+    {'note': 60, 'velocity': 70, 'duration': True},    # bool is not a duration integer
     {'velocity': 70, 'duration': 480},                # missing 'note' key
     'not-a-mapping',                                  # not a mapping at all
 ])

@@ -11,7 +11,19 @@ import asyncio
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any
+from types import MappingProxyType
+from typing import Any, Mapping
+
+
+def _freeze(value: Any) -> Any:
+    """Return an immutable copy of supported container values."""
+    if isinstance(value, dict):
+        return MappingProxyType({key: _freeze(item) for key, item in value.items()})
+    if isinstance(value, list):
+        return tuple(_freeze(item) for item in value)
+    if isinstance(value, set):
+        return frozenset(_freeze(item) for item in value)
+    return value
 
 
 def _new_event_id() -> str:
@@ -32,7 +44,7 @@ class Event:
 
     event_type: str
     source: str
-    payload: dict[str, Any]
+    payload: Mapping[str, Any]
     event_id: str = field(default_factory=_new_event_id)
     created_at: datetime = field(default_factory=_utcnow)
 
@@ -49,6 +61,7 @@ class Event:
             raise ValueError(
                 f'payload must be a dict, got {type(self.payload).__name__}'
             )
+        object.__setattr__(self, 'payload', _freeze(self.payload))
 
 
 class MurmurBlackboard:

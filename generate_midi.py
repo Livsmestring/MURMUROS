@@ -30,11 +30,11 @@ def validate_notes(notes):
             ) from None
 
         for name, value in (('note', note), ('velocity', velocity)):
-            if not isinstance(value, int) or not 0 <= value <= 127:
+            if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 127:
                 raise ValueError(
                     f"note {i}: {name} must be an integer in 0-127, got {value!r}"
                 )
-        if not isinstance(duration, int) or duration < 0:
+        if isinstance(duration, bool) or not isinstance(duration, int) or duration < 0:
             raise ValueError(
                 f"note {i}: duration must be a non-negative integer, got {duration!r}"
             )
