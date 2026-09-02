@@ -1,6 +1,29 @@
 MIT License
 
-Copyright (c) 2026 Livsmestring 
+Copyright (c) 2026 DevByNorth
+
+SCOPE OF THIS LICENSE
+---------------------
+MURMUROS is licensed in two parts. This file covers the SOFTWARE only.
+
+"The Software" means the source code and configuration in this repository,
+including but not limited to:
+
+  * core/, agents.py, demo.py          (agent infrastructure)
+  * index.js, test/, tests/            (pipeline model and test suites)
+  * generate_midi.py                   (MIDI tooling)
+  * schemas/                           (JSON Schema definitions)
+  * .github/, eslint.config.js, package.json, requirements-dev.txt,
+    and comparable build, lint and CI configuration
+
+"The Software" does NOT include the creative, editorial and pedagogical
+content of MURMUROS -- the Norwegian narrative and curriculum text, the
+archetype definitions in archetypes/, the MURMUROS Model as a pedagogical
+framework, and the MURMUROS and DevByNorth names, logos and visual assets.
+That material is licensed separately and is not granted under the terms
+below. See LICENSE-CONTENT for its terms.
+
+---------------------
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
