@@ -105,6 +105,8 @@ AI, digitale arbeidsflyter og moderne verktøy for læring og utvikling.
 
 ## Roadmap
 
+Se [ROADMAP.md](ROADMAP.md) for detaljert fase-status og [TODO.md](TODO.md) for konkrete, kortsiktige oppgaver.
+
 ### MVP 0.1
 
 * Dokumentasjon
