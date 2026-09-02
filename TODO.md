@@ -4,7 +4,7 @@ Konkrete, kortsiktige oppgaver. Se [ROADMAP.md](ROADMAP.md) for de større fasen
 
 ## Nå
 
-- [ ] **Avklar stack for fremtidig frontend** (`website/`): masterprompten som florerer i noen økter refererer til et *annet* repo (`livsmestring-hjemmeside`, Next.js/TypeScript/Tailwind/Supabase/Vercel). Avklar med Daniel om dette skal gjelde MURMUROS sin `website/`-mappe, eller om det hører hjemme i et separat repo.
+Ingen åpne oppgaver i denne kategorien akkurat nå — se Snart.
 
 ## Snart
 
@@ -28,3 +28,4 @@ Konkrete, kortsiktige oppgaver. Se [ROADMAP.md](ROADMAP.md) for de større fasen
 - [x] Murmur-agent-infrastruktur (blackboard + agentkjede)
 - [x] `ROADMAP.md` og `TODO.md` opprettet
 - [x] Animal Signal PsyTech-prototype (`generate_animal_signal.py`)
+- [x] Avklart: `livsmestring-hjemmeside` (Next.js/TypeScript/Tailwind/Supabase/Vercel) er et eget, separat repo for nettsiden — uavhengig av MURMUROS. Ingen endring i MURMUROS sin planlagte `website/`-mappe.

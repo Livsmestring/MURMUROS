@@ -43,4 +43,4 @@ Dokumentasjon og tidlig scaffolding.
 
 ## Åpne avklaringer
 
-- Stack/arkitektur for en fremtidig frontend/plattform (`website/`) er ikke besluttet. Se TODO.md.
+Ingen åpne avklaringer for øyeblikket. `livsmestring-hjemmeside` (Next.js/TypeScript/Tailwind/Supabase/Vercel) er avklart som et eget, separat repo for nettsiden, uavhengig av MURMUROS sin egen `website/`-mappe. Se TODO.md.
