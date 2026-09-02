@@ -97,3 +97,21 @@ This is not yet integrated into the main platform — it is a standalone creativ
 - **Commands**: `npm test`, `npm run lint`, `python -m pytest -q`. The `deploy:staging` script is a placeholder until real deployment exists.
 - **Dependabot** is configured for npm, pip and GitHub Actions (`.github/dependabot.yml`), so keep dependency versions explicit.
 - The `shared-ci-cd.yml` workflow is a reusable template parameterised for other repositories — do not modify it to add MURMUROS-specific logic.
+
+## Licensing
+
+MURMUROS is **split-licensed**, and the distinction matters when adding files:
+
+- **Code is MIT** (`LICENSE`) — `core/`, `agents.py`, `demo.py`, `index.js`,
+  `generate_midi.py`, `schemas/`, `test/`, `tests/`, `.github/`, and build/lint
+  config. The `LICENSE` file defines "the Software" explicitly; keep that scope
+  list in sync when adding a new top-level code directory.
+- **Content is all-rights-reserved** (`LICENSE-CONTENT`) — Norwegian narrative
+  and curriculum text, the editorial content of `archetypes/`, the MURMUROS
+  Model as a pedagogical framework, and the MURMUROS/DevByNorth names, logos
+  and assets.
+
+Note the seam inside the archetype system: the JSON Schema in `schemas/` is
+MIT-licensed code, while the archetype *entries* in `archetypes/` are reserved
+content. Copyright holder is **DevByNorth** throughout; `package.json` stays
+`"SEE LICENSE IN LICENSE"` because the split is not a single SPDX identifier.
