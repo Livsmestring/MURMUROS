@@ -69,6 +69,7 @@ MURMUROS/
 │
 ├── README.md
 ├── LICENSE
+├── LICENSE-CONTENT
 ├── CONTRIBUTING.md
 └── SECURITY.md
 ```
@@ -137,6 +138,20 @@ MURMUROS utvikles av DevByNorth som en del av arbeidet med kreativ teknologi, li
 
 ## Lisens
 
-© DevByNorth. Alle rettigheter forbeholdes.
+MURMUROS er lisensiert i to deler.
 
-Se LICENSE-filen for detaljer.
+**Programvare — MIT.** Kildekode og konfigurasjon (`core/`, `agents.py`,
+`index.js`, `generate_midi.py`, `schemas/`, `test/`, `tests/`, `.github/`
+med flere) er åpen kildekode under MIT-lisensen. Du kan fritt bruke, endre
+og bygge videre på den. Se [LICENSE](LICENSE).
+
+**Innhold — alle rettigheter forbeholdes.** Det kreative, redaksjonelle og
+pedagogiske innholdet — norsk narrativ- og kurstekst, arketypeinnholdet i
+`archetypes/`, MURMUROS-modellen som pedagogisk rammeverk, samt navnene
+MURMUROS og DevByNorth, logoer og visuelle ressurser — er
+© 2026 DevByNorth. Alle rettigheter forbeholdes.
+Se [LICENSE-CONTENT](LICENSE-CONTENT).
+
+Kort sagt: koden kan du bygge på fritt, mens innholdet og merkevaren krever
+skriftlig samtykke. Forespørsler tas via Issues eller Discussions i dette
+repoet.

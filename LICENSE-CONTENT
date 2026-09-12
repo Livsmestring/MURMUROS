@@ -1,0 +1,95 @@
+MURMUROS — Lisens for innhold / Content License
+Copyright (c) 2026 DevByNorth. Alle rettigheter forbeholdes.
+Copyright (c) 2026 DevByNorth. All rights reserved.
+
+================================================================
+NORSK
+================================================================
+
+Denne lisensen gjelder det kreative, redaksjonelle og pedagogiske
+innholdet i MURMUROS. Programvaren i dette repoet er lisensiert
+separat under MIT — se LICENSE.
+
+OMFANG
+
+Denne lisensen dekker blant annet:
+
+  * Norsk narrativ-, kurs- og formidlingstekst, inkludert dokumentasjon
+    i README.md, docs/ og onboarding/
+  * Arketypedefinisjonene i archetypes/ (det redaksjonelle innholdet i
+    filene — ikke JSON Schema-strukturen i schemas/, som er programvare)
+  * MURMUROS-modellen som pedagogisk rammeverk, og prosesstrinnene den
+    beskriver
+  * Navnene "MURMUROS" og "DevByNorth", logoer, grafikk, lyd, musikk og
+    øvrige visuelle og auditive ressurser
+
+RETTIGHETER
+
+Alle rettigheter forbeholdes. Innholdet kan ikke kopieres, endres,
+distribueres, fremføres offentlig eller brukes til å lage avledede verk
+uten skriftlig forhåndssamtykke fra DevByNorth.
+
+TILLATT BRUK UTEN SAMTYKKE
+
+  * Lesing og privat bruk av innholdet slik det foreligger i repoet
+  * Sitat i tråd med åndsverkloven, med tydelig kildeangivelse
+  * Nødvendig midlertidig kopiering for å kjøre, teste eller bidra til
+    programvaren i dette repoet
+
+BIDRAG
+
+Bidrag med innhold til dette repoet forutsetter at bidragsyteren har
+rett til å gi bidraget, og innebærer at det kan brukes i MURMUROS på
+samme vilkår som øvrig innhold. Se CONTRIBUTING.md.
+
+FORESPØRSLER
+
+Forespørsler om bruk utover dette rettes til DevByNorth via
+GitHub Issues eller Discussions i dette repoet.
+
+================================================================
+ENGLISH
+================================================================
+
+This license covers the creative, editorial and pedagogical content of
+MURMUROS. The software in this repository is licensed separately under
+the MIT License — see LICENSE.
+
+SCOPE
+
+This license covers, among other things:
+
+  * Norwegian narrative, curriculum and educational text, including the
+    documentation in README.md, docs/ and onboarding/
+  * The archetype definitions in archetypes/ (the editorial content of
+    those files — not the JSON Schema structure in schemas/, which is
+    software)
+  * The MURMUROS Model as a pedagogical framework, and the process
+    stages it describes
+  * The "MURMUROS" and "DevByNorth" names, logos, graphics, audio,
+    music and other visual and auditory assets
+
+RIGHTS
+
+All rights reserved. This content may not be copied, modified,
+distributed, publicly performed, or used to create derivative works
+without the prior written consent of DevByNorth.
+
+PERMITTED WITHOUT CONSENT
+
+  * Reading and private use of the content as provided in this repository
+  * Quotation as permitted by applicable copyright law, with clear
+    attribution
+  * Incidental and temporary copying necessary to run, test or contribute
+    to the software in this repository
+
+CONTRIBUTIONS
+
+Contributing content to this repository requires that the contributor
+has the right to do so, and permits that content to be used in MURMUROS
+on the same terms as other content. See CONTRIBUTING.md.
+
+REQUESTS
+
+Requests for use beyond the above should be directed to DevByNorth via
+GitHub Issues or Discussions in this repository.

@@ -51,3 +51,19 @@ MURMUROS lages for ungdom. Derfor gjelder alltid:
 - **Aldri** legg hemmeligheter (API-nøkler, passord, tokens) i repoet. Bruk GitHub Secrets.
 
 Se også [SECURITY.md](SECURITY.md) for hvordan du rapporterer sikkerhetsproblemer.
+
+## Lisens for bidrag
+
+MURMUROS er lisensiert i to deler, og bidrag følger den delen de hører til:
+
+- **Kode** (`core/`, `index.js`, `schemas/`, `test/`, `tests/`, `.github/` med
+  flere) lisensieres under **MIT** — se [LICENSE](LICENSE).
+- **Innhold** (norsk narrativ- og kurstekst, arketypeinnholdet i
+  `archetypes/`, pedagogisk materiale, grafikk og lyd) er
+  **© DevByNorth, alle rettigheter forbeholdes** — se
+  [LICENSE-CONTENT](LICENSE-CONTENT).
+
+Når du åpner en pull request, bekrefter du at du har rett til å bidra med
+innholdet, og at bidraget kan brukes i MURMUROS på vilkårene over. Bidra
+aldri med materiale du ikke har rettigheter til — det gjelder også tekst,
+bilder, lyd og musikk hentet fra andre kilder.

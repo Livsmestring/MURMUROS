@@ -1,0 +1,20 @@
+{
+  "id": "skaperen",
+  "navn": "Skaperen",
+  "beskrivelse": "Den som former nye ideer og uttrykk, drevet av fantasi og et ønske om å bygge noe eget.",
+  "styrker": ["kreativitet", "visjon", "utholdenhet"],
+  "artistDNA": {
+    "sjanger": ["indie", "elektronika"],
+    "stemning": ["nysgjerrig", "drømmende"]
+  },
+  "musikkDNA": {
+    "tempo": { "min": 90, "max": 120 },
+    "toneart": ["C-dur", "A-moll"],
+    "instrumenter": ["synth", "gitar", "trommer"]
+  },
+  "visueltDNA": {
+    "farger": ["#2A9D8F", "#E9C46A"],
+    "former": ["spiral", "trekant"],
+    "stil": "organisk og fargerik"
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://murmuros.no/schemas/archetype.schema.json",
+  "title": "Arketype",
+  "description": "An entry in the MURMUROS Archetype Library. Each archetype carries the creative DNA (artist / musikk / visuelt) that later pipeline stages build on.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "navn", "beskrivelse", "styrker", "artistDNA", "musikkDNA", "visueltDNA"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Stable, lowercase kebab-case identifier. Must match the file name.",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "navn": {
+      "type": "string",
+      "description": "Human-readable Norwegian name.",
+      "minLength": 1
+    },
+    "beskrivelse": {
+      "type": "string",
+      "description": "Short Norwegian description of the archetype.",
+      "minLength": 1
+    },
+    "styrker": {
+      "type": "array",
+      "description": "Core strengths associated with the archetype.",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "artistDNA": {
+      "type": "object",
+      "description": "Artist DNA pipeline stage: genre and mood signature.",
+      "additionalProperties": false,
+      "required": ["sjanger", "stemning"],
+      "properties": {
+        "sjanger": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "stemning": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "musikkDNA": {
+      "type": "object",
+      "description": "Musikk DNA pipeline stage: tempo range, key and instrumentation.",
+      "additionalProperties": false,
+      "required": ["tempo", "toneart", "instrumenter"],
+      "properties": {
+        "tempo": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["min", "max"],
+          "properties": {
+            "min": { "type": "integer", "minimum": 20, "maximum": 300 },
+            "max": { "type": "integer", "minimum": 20, "maximum": 300 }
+          }
+        },
+        "toneart": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "instrumenter": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      }
+    },
+    "visueltDNA": {
+      "type": "object",
+      "description": "Visuelt DNA pipeline stage: colour palette, forms and style.",
+      "additionalProperties": false,
+      "required": ["farger", "former", "stil"],
+      "properties": {
+        "farger": {
+          "type": "array",
+          "description": "Hex colour codes.",
+          "items": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "former": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "stil": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
