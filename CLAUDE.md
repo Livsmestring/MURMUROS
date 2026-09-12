@@ -50,7 +50,7 @@ MURMUROS/
 └── assets/
 ```
 
-`core/`, `archetypes/` and `schemas/` now exist; create the rest as features are implemented.
+`core/`, `archetypes/`, `schemas/` and `docs/` now exist; create the rest as features are implemented.
 
 ## CI/CD Pipeline
 
@@ -97,6 +97,21 @@ This is not yet integrated into the main platform — it is a standalone creativ
 - **Commands**: `npm test`, `npm run lint`, `python -m pytest -q`. The `deploy:staging` script is a placeholder until real deployment exists.
 - **Dependabot** is configured for npm, pip and GitHub Actions (`.github/dependabot.yml`), so keep dependency versions explicit.
 - The `shared-ci-cd.yml` workflow is a reusable template parameterised for other repositories — do not modify it to add MURMUROS-specific logic.
+
+## Task Blocks
+
+Assignments for this repo are written using the **MurMur Task Block** template in
+`docs/prompts/murmur-task-block.md`. When a request arrives in that shape, treat
+its four sections as binding:
+
+- **KONTEKST** — the stated starting facts. If the request says something is not
+  known, do not invent a plausible value; ask.
+- **OPPDRAG** — numbered steps, executed in order.
+- **AKSEPTKRITERIER** — the definition of done, including the negative criteria
+  (what must *not* have happened). Verify each one before reporting completion.
+- **PORTER** — hard stops. Stop where the block says stop and wait for approval;
+  do not pass a gate on your own judgement. Batch work runs one case first, shows
+  the result, and waits for explicit go-ahead before the rest.
 
 ## Licensing
 
