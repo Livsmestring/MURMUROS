@@ -17,5 +17,8 @@
     "@eslint/js": "^10.0.1",
     "eslint": "^10.8.0",
     "globals": "^17.8.0"
+  },
+  "dependencies": {
+    "docx": "^9.7.2"
   }
 }
